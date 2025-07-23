@@ -1,0 +1,6 @@
+@ecommerceApi_netcore_devtalles_HostAddress = http://localhost:5198
+
+GET {{ecommerceApi_netcore_devtalles_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
