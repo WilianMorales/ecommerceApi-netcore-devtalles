@@ -97,7 +97,7 @@ namespace ecommerceApi_netcore_devtalles.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult UpdateCategory(int id, [FromBody] CreateCategoryDto updateCategoryDto)
         {
-            if(!_categoryRepository.CategoryExists(id))
+            if (!_categoryRepository.CategoryExists(id))
             {
                 return NotFound($"No se encontró la categoría con ID {id}.");
             }
@@ -124,5 +124,32 @@ namespace ecommerceApi_netcore_devtalles.Controllers
             return NoContent();
         }
 
+        [HttpDelete("{id:int}", Name = "DeleteCategory")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult DeleteCategory(int id)
+        {
+            if (!_categoryRepository.CategoryExists(id))
+            {
+                return NotFound($"No se encontró la categoría con ID {id}.");
+            }
+
+            var category = _categoryRepository.GetCategoryById(id);
+            if (category == null)
+            {
+                return NotFound($"La categoría el ID {id} no existe.");
+            }
+
+            if (!_categoryRepository.DeleteCategory(category))
+            {
+                ModelState.AddModelError("CustomError", $"Algo salió mal al eliminar el registro {category.Name}.");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
     }
 }
