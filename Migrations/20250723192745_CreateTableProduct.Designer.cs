@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ecommerceApi_netcore_devtalles.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250723191531_CreateTableProduct")]
+    [Migration("20250723192745_CreateTableProduct")]
     partial class CreateTableProduct
     {
         /// <inheritdoc />
@@ -46,11 +46,11 @@ namespace ecommerceApi_netcore_devtalles.Migrations
 
             modelBuilder.Entity("ecommerceApi_netcore_devtalles.Models.Product", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ProductId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductId"));
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
@@ -83,7 +83,7 @@ namespace ecommerceApi_netcore_devtalles.Migrations
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id");
+                    b.HasKey("ProductId");
 
                     b.HasIndex("CategoryId");
 

@@ -7,7 +7,7 @@ namespace ecommerceApi_netcore_devtalles.Models;
 public class Product
 {
     [Key]
-    public int Id { get; set; }
+    public int ProductId { get; set; }
     [Required]
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
