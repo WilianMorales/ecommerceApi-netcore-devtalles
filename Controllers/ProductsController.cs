@@ -95,7 +95,7 @@ namespace ecommerceApi_netcore_devtalles.Controllers
             return CreatedAtRoute("GetProductById", new { productId = product.ProductId }, productDto);
         }
 
-        [HttpGet("searchByCategory/{categoryId:int}", Name = "GetProductsbyCategory")]
+        [HttpGet("searchProductByCategory/{categoryId:int}", Name = "GetProductsbyCategory")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -106,6 +106,23 @@ namespace ecommerceApi_netcore_devtalles.Controllers
             if (products.Count == 0)
             {
                 return NotFound($"No se encontraron productos para la categoría con ID {categoryId}.");
+            }
+
+            var productsDto = _mapper.Map<List<ProductDto>>(products);
+            return Ok(productsDto);
+        }
+
+        [HttpGet("searchProductByNameDescription/{searchTerm}", Name = "SearchProducts")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public IActionResult SearchProducts(string searchTerm)
+        {
+            var products = _productRepository.SearchProducts(searchTerm);
+            if (products.Count == 0)
+            {
+                return NotFound($" No se encontraron productos que coincidan con el nombre o descripción '{searchTerm}'");
             }
 
             var productsDto = _mapper.Map<List<ProductDto>>(products);
