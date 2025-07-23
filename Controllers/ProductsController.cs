@@ -90,7 +90,9 @@ namespace ecommerceApi_netcore_devtalles.Controllers
                 return StatusCode(500, ModelState);
             }
 
-            return CreatedAtRoute("GetProductById", new { productId = product.ProductId }, product);
+            var createProduct = _productRepository.GetProductById(product.ProductId);
+            var productDto = _mapper.Map<ProductDto>(createProduct);
+            return CreatedAtRoute("GetProductById", new { productId = product.ProductId }, productDto);
         }
     }
 }

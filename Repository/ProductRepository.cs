@@ -1,6 +1,7 @@
 using System;
 using ecommerceApi_netcore_devtalles.Models;
 using ecommerceApi_netcore_devtalles.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 
 namespace ecommerceApi_netcore_devtalles.Repository;
 
@@ -56,10 +57,10 @@ public class ProductRepository : IProductRepository
         {
             return null;
         }
-        return _db.Products.FirstOrDefault(p => p.ProductId == id);
+        return _db.Products.Include(p => p.Category).FirstOrDefault(p => p.ProductId == id);
     }
 
-    public ICollection<Product> GetAllProducts() => [.. _db.Products.OrderBy(p => p.Name)];
+    public ICollection<Product> GetAllProducts() => [.. _db.Products.Include(p => p.Category).OrderBy(p => p.Name)];
 
     public ICollection<Product> GetProductsByCategory(int categoryId)
     {
