@@ -4,6 +4,7 @@ using ecommerceApi_netcore_devtalles.Models.Dtos;
 using ecommerceApi_netcore_devtalles.Repository.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace ecommerceApi_netcore_devtalles.Controllers
 {
@@ -129,5 +130,46 @@ namespace ecommerceApi_netcore_devtalles.Controllers
             return Ok(productsDto);
         }
 
+        [HttpPatch("buyProduct/{name}/{quantity:int}", Name = "BuyProduct")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public IActionResult BuyProduct(string? name, int quantity)
+        {
+            if (string.IsNullOrWhiteSpace(name) || quantity <= 0)
+            {
+                return BadRequest("El nombre del producto o la cantidad no son válidos.");
+            }
+
+            var productExists = _productRepository.ProductExists(name);
+            if (!productExists)
+            {
+                return NotFound($"No se encontró el producto con nombre '{name}'.");
+            }
+
+            var product = _productRepository.GetProductByName(name);
+            if (product == null)
+            {
+                return StatusCode(500, "Ocurrió un error al obtener los detalles del producto.");
+            }
+
+            if (product.Stock < quantity)
+            {
+                return BadRequest($"No hay suficiente stock para el producto '{name}'. Stock disponible: {product.Stock}.");
+            }
+
+
+            var success = _productRepository.BuyProduct(name, quantity);
+            if (!success)
+            {
+                ModelState.AddModelError("CustomError", $"No se pudo realizar la compra del producto '{name}'");
+                return StatusCode(500, ModelState);
+            }
+
+            var units = quantity == 1 ? "unidad" : "unidades";
+
+            return Ok($"Compra realizada exitosamente. Producto: {name}, Cantidad: {quantity} {units}.");
+        }
     }
 }

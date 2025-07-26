@@ -60,7 +60,15 @@ public class ProductRepository : IProductRepository
         return _db.Products.Include(p => p.Category).FirstOrDefault(p => p.ProductId == id);
     }
 
-    public ICollection<Product> GetAllProducts() => [.. _db.Products.Include(p => p.Category).OrderBy(p => p.Name)];
+    public Product? GetProductByName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return null;
+
+        var normalizedName = name.ToLower().Trim();
+        return _db.Products.FirstOrDefault(p => p.Name.ToLower().Trim() == normalizedName);
+    }
+
+    public ICollection<Product> GetAllProducts() => _db.Products.Include(p => p.Category).OrderBy(p => p.Name).ToList();
 
     public ICollection<Product> GetProductsByCategory(int categoryId)
     {
