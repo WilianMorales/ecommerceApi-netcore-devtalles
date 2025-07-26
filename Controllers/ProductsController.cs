@@ -171,5 +171,73 @@ namespace ecommerceApi_netcore_devtalles.Controllers
 
             return Ok($"Compra realizada exitosamente. Producto: {name}, Cantidad: {quantity} {units}.");
         }
+
+        [HttpPut("{productId:int}", Name = "UpdateProduct")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult UpdateProduct(int productId, [FromBody] UpdateProductDto updateProductDto)
+        {
+            if (updateProductDto == null)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_productRepository.ProductExists(productId))
+            {
+                ModelState.AddModelError("CustomError", "El producto no existe.");
+                return BadRequest(ModelState);
+            }
+
+            if (!_categoryRepository.CategoryExists(updateProductDto.CategoryId))
+            {
+                ModelState.AddModelError("CustomError", "La categoría especificada no existe.");
+                return BadRequest(ModelState);
+            }
+
+            var product = _mapper.Map<Product>(updateProductDto);
+            product.ProductId = productId;
+            if (!_productRepository.UpdateProduct(product))
+            {
+                ModelState.AddModelError("CustomError", $"Error al Actualizar los datos del producto {product.Name}.");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
+
+        [HttpDelete("{productId:int}", Name = "DeleteProduct")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public IActionResult DeleteProduct(int productId)
+        {
+            if (productId == 0)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (!_productRepository.ProductExists(productId))
+            {
+                return NotFound($"No se encontró el producto con ID {productId}.");
+            }
+
+            var product = _productRepository.GetProductById(productId);
+            if (product == null)
+            {
+                return NotFound($"El producto con ID {productId} no existe.");
+            }
+
+            if (!_productRepository.DeleteProduct(product))
+            {
+                ModelState.AddModelError("CustomError", $"Error al eliminar el producto {product.Name}.");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
     }
 }
