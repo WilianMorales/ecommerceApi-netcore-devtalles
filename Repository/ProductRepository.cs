@@ -13,6 +13,8 @@ public class ProductRepository : IProductRepository
         _db = db;
     }
 
+    private string Normalize(string input) => input.ToLower().Trim();
+
     public bool BuyProduct(string name, int quantity)
     {
         if (string.IsNullOrEmpty(name) || quantity <= 0)
@@ -100,19 +102,21 @@ public class ProductRepository : IProductRepository
 
     public bool Save()
     {
-        return _db.SaveChanges() >= 0 ? true : false;
+        return _db.SaveChanges() >= 0;
     }
 
     public ICollection<Product> SearchProducts(string searchTerm)
     {
-        IQueryable<Product> query = _db.Products;
-        var searchTermLowered = searchTerm.ToLower().Trim();
-        if (!string.IsNullOrEmpty(searchTerm))
+        if (string.IsNullOrWhiteSpace(searchTerm))
         {
-            query = query.Include(p => p.Category).Where(
-                p => p.Name.ToLower().Trim().Contains(searchTermLowered) ||
-                     p.Description.ToLower().Trim().Contains(searchTermLowered));
+            return _db.Products.Include(p => p.Category).OrderBy(p => p.Name).ToList();
         }
+
+        var searchTermLowered = Normalize(searchTerm);
+        var query = _db.Products.Include(p => p.Category)
+            .Where(p =>
+                p.Name.ToLower().Trim().Contains(searchTermLowered) ||
+                p.Description.ToLower().Trim().Contains(searchTermLowered));
         return query.OrderBy(p => p.Name).ToList();
     }
 
