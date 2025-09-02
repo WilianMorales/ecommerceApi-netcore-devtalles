@@ -1,6 +1,7 @@
 using AutoMapper;
 using ecommerceApi_netcore_devtalles.Models.Dtos;
 using ecommerceApi_netcore_devtalles.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -9,6 +10,7 @@ namespace ecommerceApi_netcore_devtalles.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CategoriesController : ControllerBase
     {
         private readonly ICategoryRepository _categoryRepository;
